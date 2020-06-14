@@ -80,18 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
             'seconds': seconds
         };
     }
-// если цифра больше или равна нулю И
-// меньше десяти, то вернуть num значение 0+число
-// иначе вернуть просто num
-function getZero(num) {
-    if (num >= 0 && num < 10){
-        return `0${num}`;
-    }else{
-        return num;
+    // если цифра больше или равна нулю И
+    // меньше десяти, то вернуть num значение 0+число
+    // иначе вернуть просто num
+    function getZero(num) {
+        if (num >= 0 && num < 10) {
+            return `0${num}`;
+        } else {
+            return num;
+        }
     }
-}
 
-// устанавливает время
+    // устанавливает время
 
     function setClock(selector, endtime) {
         const timer = document.querySelector(selector),
@@ -101,10 +101,10 @@ function getZero(num) {
             seconds = timer.querySelector('#seconds'),
             timeInterval = setInterval(updateClock, 1000);
 
-// мигание вёрстки
-    updateClock();
+        // мигание вёрстки
+        updateClock();
 
-// обновляет таймер
+        // обновляет таймер
         function updateClock() {
             // постоянная получает остаток времени от endtime 
             const t = getTimeRemaining(endtime);
@@ -123,10 +123,47 @@ function getZero(num) {
             }
         }
     }
-// вызываем функцию с селектором таймер и переменной deadline
-// таймер - то для какого элементы мы применяем,
-// дедлайн - дата когда таймер должен остановиться
-setClock('.timer', deadline);
+    // вызываем функцию с селектором таймер и переменной deadline
+    // таймер - то для какого элементы мы применяем,
+    // дедлайн - дата когда таймер должен остановиться
+    setClock('.timer', deadline);
 
+// Modal window
+
+
+const modalBtn = document.querySelectorAll('[data-close]'),
+      modalWindow = document.querySelector('.modal'),
+      modalCloseBtn = document.querySelector('.modal__close');
+      
+
+
+modalBtn.forEach(i => {
+    i.addEventListener('click', () => {
+        modalWindow.classList.add('show');
+        modalWindow.classList.remove('hide');
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+
+function closeModal() {
+    modalWindow.classList.add('hide');
+    modalWindow.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+modalCloseBtn.addEventListener('click', closeModal);
+
+modalWindow.addEventListener('click', (e) => {
+    if (e.target === modalWindow) {
+        closeModal();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === "Escape" && modalWindow.classList.contains('show')){
+        closeModal();
+    }
+});
 
 });
