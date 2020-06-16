@@ -314,12 +314,18 @@ document.addEventListener('DOMContentLoaded', () => {
             request.open('POST', 'server.php');
 
             // заголовок назначается автоматически
-            // request.setRequestHeader('Content-type', 'multipart/form-data');
-
+            request.setRequestHeader('Content-type', 'application/json');
             // создаем переменную, которая будет хранить данные формы из формы 
             const formData = new FormData(form);
+            // мы создали объект, потому что из formdata нельзя преобразовать в JSON
+            const obj = {}; // объект пустой
+            formData.forEach(function(value, key){ // мы перебрали formdata
+                obj[key] = value; // и присвоили значения объекту
+            });
+
+            const json = JSON.stringify(obj);
             // запрос на отправку
-            request.send(formData);
+            request.send(json);
 
             // когда запрс грузится
             request.addEventListener('load', () => {
