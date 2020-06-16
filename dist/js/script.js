@@ -1,3 +1,5 @@
+'use strict';
+
 // создаем счётчик событий, который запускает наш код только тогда, когда дерево DOM построено
 document.addEventListener('DOMContentLoaded', () => {
     // создаем переменные. первая указывает на сами блок-кнопки;  
@@ -279,5 +281,65 @@ document.addEventListener('DOMContentLoaded', () => {
         '.menu .container'
     ).render();
 
+    // Forms
+        // создали переменную и вложили в нее  все формы
+    const forms = document.querySelectorAll('form');
+        // создали объект, содержащий статусы каждого из сообщений
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо, скоро мы с Вами свяжемся',
+        failure: 'Упс, что-то пошло не так'
+    };
+        // все формы перебираем для отправки
+    forms.forEach(item => {
+        postData(item);
+    });
+        // функция отправить данные, в ней аргумент форма
+    function postData(form) {
+        // для формы добавляем обрабочик
+        form.addEventListener('submit', (e) => {
+            // отключаем перезагрузку страницы
+            e.preventDefault();
+            // создаем элемент в котором будет статус нашей отправки
+            const statusMessage = document.createElement('div');
+            // добавляем переменной класс статус
+            statusMessage.classList.add('status');
+            // засовываем в неё текст загрузки из объекта message
+            statusMessage.textContent = message.loading;
+            // выводим статус внутри формы
+            form.append(statusMessage);
+            // создаем переменную запрос на сервер
+            const request = new XMLHttpRequest();
+            // открываем его, настройка типа пост и в серверный файл
+            request.open('POST', 'server.php');
+
+            // заголовок назначается автоматически
+            // request.setRequestHeader('Content-type', 'multipart/form-data');
+
+            // создаем переменную, которая будет хранить данные формы из формы 
+            const formData = new FormData(form);
+            // запрос на отправку
+            request.send(formData);
+
+            // когда запрс грузится
+            request.addEventListener('load', () => {
+                // если запрос успешен
+                if (request.status === 200){
+                    // выводим что в ответе у нас от сервера
+                    console.log(request.response);
+                    // показываем сообщение об успешной отправку
+                    statusMessage.textContent = message.success;
+                    // сбрасываем данные формы
+                    form.reset();
+                    // удаляем сообщение, которое появилось
+                    setTimeout(() => statusMessage.remove(), 2000);
+                } else{
+                    // если ничего не отправилось, то указать ошибку
+                    statusMessage.textContent = message.failure; 
+                }
+
+            });
+        });
+    }
 
 });
