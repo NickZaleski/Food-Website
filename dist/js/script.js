@@ -169,15 +169,101 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const modalTimerId = setTimeout(openModal, 5000);
-    
-    function showModalByScroll(){
-        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight){
+    // const modalTimerId = setTimeout(openModal, 5000);
+
+    function showModalByScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
             openModal();
-            window.removeEventListener('scroll',showModalByScroll);
+            window.removeEventListener('scroll', showModalByScroll);
         }
     }
+    window.addEventListener('scroll', showModalByScroll);
 
-    window.addEventListener('scroll',showModalByScroll);
+    // menu template
+
+    class MenuCard {
+        constructor(src, alt, title, description, price, parentSelector) {
+            this.src = src;
+            this.alt = alt;
+            this.title = title;
+            this.description = description;
+            // цена в долларах
+            this.price = price;
+            // указываем на родительский элемент 
+            this.parent = document.querySelector(parentSelector);
+            // курс гривны к доллару
+            this.transfer = 27;
+            // функция которая уже возвращает цену в гривнах
+            this.changeToUAH();
+        }
+
+        changeToUAH() {
+            // цену в долларах переводим по курсу в гривны
+            this.price = this.price * this.transfer;
+            
+        }
+
+        render() {
+        // создаем элемент с тегом div
+            const element = document.createElement('div');
+        // внутрь элемента помещаем вот такой html код
+            element.innerHTML = `  
+                <div class="menu__item">
+                    <img src=${this.src} alt=${this.alt}>
+                        <h3 class="menu__item-subtitle">${this.title}</h3>
+                        <div class="menu__item-descr">${this.description}</div>
+                        <div class="menu__item-divider"></div>
+                        <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    </div>
+                </div>
+            `;
+            // просим отобразить этот элемент на странице
+            this.parent.append(element);
+        }
+
+    }
+    // создаем новую карточку, перечисляя все параметры, как в классе MenuCard
+    new MenuCard(
+        "img/tabs/vegy.jpg",
+        "vegy",
+        // не забываем комбинировать кавычки
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        // число указываем без кавычек
+        9,
+        // указываем родительский элемент
+        // контейнеров много на странице, указываем, что этот дочерний menu
+        '.menu .container '
+    ).render();
+
+    new MenuCard(
+        "img/tabs/elite.jpg",
+        "elite",
+        // не забываем комбинировать кавычки
+        'Меню “Премиум”',
+        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+        // число указываем без кавычек
+        14,
+        // указываем родительский элемент
+        // контейнеров много на странице, указываем, что этот дочерний menu
+        '.menu .container '
+    ).render();
+
+
+    new MenuCard(
+        "img/tabs/post.jpg",
+        "post",
+        // не забываем комбинировать кавычки
+        'Меню "Постное"',
+        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+        // число указываем без кавычек
+        21,
+        // указываем родительский элемент
+        // контейнеров много на странице, указываем, что этот дочерний menu
+        '.menu .container '
+    ).render();
+    
 
 });
