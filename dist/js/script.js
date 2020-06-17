@@ -312,43 +312,44 @@ document.addEventListener('DOMContentLoaded', () => {
             // выводим статус внутри формы
             form.append(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage);
-            // создаем переменную запрос на сервер
-            const request = new XMLHttpRequest();
-            // открываем его, настройка типа пост и в серверный файл
-            request.open('POST', 'server.php');
+            // создаем переменную запрос на сервер`
+            
+            
 
             // заголовок назначается автоматически
-            request.setRequestHeader('Content-type', 'application/json');
+            
             // создаем переменную, которая будет хранить данные формы из формы 
             const formData = new FormData(form);
-            // мы создали объект, потому что из formdata нельзя преобразовать в JSON
+            // // мы создали объект, потому что из formdata нельзя преобразовать в JSON
             const obj = {}; // объект пустой
             formData.forEach(function(value, key){ // мы перебрали formdata
                 obj[key] = value; // и присвоили значения объекту
             });
 
-            const json = JSON.stringify(obj);
-            // запрос на отправку
-            request.send(json);
-
-            // когда запрс грузится
-            request.addEventListener('load', () => {
-                // если запрос успешен
-                if (request.status === 200){
-                    // выводим что в ответе у нас от сервера
-                    console.log(request.response);
-                    // показываем сообщение об успешной отправку
-                    showThanksModal(message.success);
-                    // сбрасываем данные формы
-                    form.reset();
-                    // удаляем сообщение, которое появилось
-                    statusMessage.remove();
-                } else{
-                    // если ничего не отправилось, то указать ошибку
-                    showThanksModal(message.failure); 
-                }
-
+            
+            fetch('server.php', {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(obj)
+            })
+            .then(data => data.text())
+            .then(data => {
+                console.log(data);
+                
+                showThanksModal(message.success);
+                
+                
+               
+                statusMessage.remove();
+            }).catch(() => {
+                showThanksModal(message.failure); 
+            }).finally(() => {
+                form.reset();
             });
+
+        
         });
     }
 
@@ -376,8 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }, 4000);
     }
-
-
 
 
 
