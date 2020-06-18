@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';ыы
 
 // создаем счётчик событий, который запускает наш код только тогда, когда дерево DOM построено
 document.addEventListener('DOMContentLoaded', () => {
@@ -148,8 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
         i.addEventListener('click', openModal);
     });
 
-
-
     function closeModal() {
         modalWindow.classList.add('hide');
         modalWindow.classList.remove('show');
@@ -240,46 +238,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     }
-    // создаем новую карточку, перечисляя все параметры, как в классе MenuCard
-    new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegy",
-        // не забываем комбинировать кавычки
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        // число указываем без кавычек
-        9,
-        // указываем родительский элемент
-        // контейнеров много на странице, указываем, что этот дочерний menu
-        '.menu .container '
-    ).render();
 
-    new MenuCard(
-        "img/tabs/elite.jpg",
-        "elite",
-        // не забываем комбинировать кавычки
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        // число указываем без кавычек
-        14,
-        // указываем родительский элемент
-        // контейнеров много на странице, указываем, что этот дочерний menu
-        '.menu .container'
-    ).render();
+    const getResource = async (url) => {
+        const res = await fetch(url); 
+           
+            if (!res.ok){
+                throw new Error(`Could not fetch ${utl}, status: ${res.status}`);
+           }
+        return await res.json();
+    };
 
-
-    new MenuCard(
-        "img/tabs/post.jpg",
-        "post",
-        // не забываем комбинировать кавычки
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        // число указываем без кавычек
-        21,
-        // указываем родительский элемент
-        // контейнеров много на странице, указываем, что этот дочерний menu
-        '.menu .container'
-    ).render();
+        getResource('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(({img, altimg, title, descr, price}) => {
+                new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+            });
+        });
 
     // Forms
         // создали переменную и вложили в нее  все формы
@@ -292,10 +266,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
         // все формы перебираем для отправки
     forms.forEach(item => {
-        postData(item);
+        bindPostData(item);
     });
+
+    const postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: data
+        });
+        return await res.json();
+    };
+
         // функция отправить данные, в ней аргумент форма
-    function postData(form) {
+    function bindPostData(form) {
         // для формы добавляем обрабочик
         form.addEventListener('submit', (e) => {
             // отключаем перезагрузку страницы
@@ -321,27 +307,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // создаем переменную, которая будет хранить данные формы из формы 
             const formData = new FormData(form);
             // // мы создали объект, потому что из formdata нельзя преобразовать в JSON
-            const obj = {}; // объект пустой
-            formData.forEach(function(value, key){ // мы перебрали formdata
-                obj[key] = value; // и присвоили значения объекту
-            });
-
+            // сначала мы данные из формы делаем массивом массивов, затем
+            // делаем из него объект, а объект формируем в JSON формат
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
             
-            fetch('server.php', {
-                method: "POST",
-                headers: {
-                    'Content-type': 'application/json'
-                },
-                body: JSON.stringify(obj)
-            })
-            .then(data => data.text())
+            
+            postData('http://localhost:3000/requests', json)
             .then(data => {
                 console.log(data);
-                
                 showThanksModal(message.success);
-                
-                
-               
                 statusMessage.remove();
             }).catch(() => {
                 showThanksModal(message.failure); 
@@ -378,6 +352,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-
+    fetch('http://localhost:3000/menu')
+        .then(data => data.json())
+        .then(res => console.log(res));
 
 });
