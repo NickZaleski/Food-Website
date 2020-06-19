@@ -55,8 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // timer
 
-
-    const deadline = '2020-06-15';
+    const deadline = '2020-06-27';
 
     function getTimeRemaining(endtime) {
 
@@ -262,32 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-
-    // // если нам нужно построить что-то только один раз:
-    // getResource('http://localhost:3000/menu')
-    // .then(data => createCard(data));
-
-    // function createCard(data)  {
-    //     data.forEach(({img, altimg, title, descr, price}) => {
-    //         const element = document.createElement('div')
-    //         element.classList.add('menu__item');
-    //         price = price * 27;
-    //         element.innerHTML = `
-    //             <img src=${img} alt=${altimg}>
-    //                 <h3 class="menu__item-subtitle">${title}</h3>
-    //                 <div class="menu__item-descr">${descr}</div>
-    //                 <div class="menu__item-divider"></div>
-    //                 <div class="menu__item-price">
-    //                 <div class="menu__item-cost">Цена:</div>
-    //                 <div class="menu__item-total"><span>${price}</span> грн/день</div>
-    //             </div>
-    //         `;
-    //         document.querySelector('.menu .container').append(element);
-    //     });
-    // }
-
-
-
     // Forms
     // создали переменную и вложили в нее  все формы
     const forms = document.querySelectorAll('form');
@@ -323,25 +296,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusMessage = document.createElement('img');
             // создал аттрибут src
             statusMessage.src = message.loading;
-            // засовываем в неё текст загрузки из объекта message
+           
             statusMessage.style.cssText = `
             display: block;
             margin: 0 auto;
             `;
-            // выводим статус внутри формы
+           
             form.append(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage);
-            // создаем переменную запрос на сервер`
+           
 
 
 
-            // заголовок назначается автоматически
-
-            // создаем переменную, которая будет хранить данные формы из формы 
+            
             const formData = new FormData(form);
-            // // мы создали объект, потому что из formdata нельзя преобразовать в JSON
-            // сначала мы данные из формы делаем массивом массивов, затем
-            // делаем из него объект, а объект формируем в JSON формат
+            
             const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
 
@@ -391,57 +360,81 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // silder
 
-    // получить все элементы, с которыми будем работать: кнопки, цфиры, картинки
-    // параметр, определяющий слайд (индекс) будем исопльзовать и менять
-    // функция карусель, показывающая слайд: показ слайд: принимает индекс x показывает картинку x, остальные скрывает
-    // после создания функции повесить обработчик события и сказать: запусти функцию вправо и покажет след слайд и меняет индекс +1, если лево, то инлекс -1.
-    // если индекс меньше 10, то подставлять нолик к нашей системе отображения текущего слайда
-
     const current = document.querySelector('#current'),
         total = document.querySelector('#total'),
         slides = document.querySelectorAll('.offer__slide'),
         prev = document.querySelector('.offer__slider-prev'),
-        next = document.querySelector('.offer__slider-next');
-    let slideIndex = 1;
+        next = document.querySelector('.offer__slider-next'),
+        slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+        slidesField = document.querySelector('.offer__slider-inner'),
+        width = window.getComputedStyle(slidesWrapper).width;
 
-    if (slides.length < 10) {
+    let slideIndex = 1;
+    let offset = 0;
+
+
+     if (slides.length < 10) {
         total.textContent = `0${slides.length}`;
+        current.textContent = `0${slideIndex}`
     } else {
         total.textContent = slides.length;
+        current.textContent = slideIndex;
     };
 
-    function showSliderContent(n) {
-        if (n > slides.length) {
-            slideIndex = 1;
-        }
-        if (n < 1) {
-            slideIndex = slides.length;
-        }
-        slides.forEach(item => {
-            item.classList.add('hide');
+    slidesField.style.width = 100 * slides.length + '%';
+    slidesField.style.display = 'flex';
+    slidesField.style.transition = '0.5s all';
+    slidesWrapper.style.overflow = 'hidden';
 
-        });
-        slides[slideIndex - 1].classList.remove('hide');
-        slides[slideIndex - 1].classList.add('show');
-
-        if (slides.length < 10) {
-            current.textContent = `0${slideIndex}`;
-        } else {
-            current.textContent = slideIndex;
-        };
-    }
-
-    showSliderContent(slideIndex);
-
-    function plusSlides(n) {
-        showSliderContent(slideIndex += n);
-    }
-
-    prev.addEventListener('click', () => {
-        plusSlides(-1);
+    slides.forEach(slide => {
+        slide.style.width = width;
     });
 
     next.addEventListener('click', () => {
-        plusSlides(1);
+        if (offset == +width.slice(0, width.length - 2) * (slides.length -1 ) ){
+            offset = 0;
+        } else {
+            offset += +width.slice(0, width.length - 2);
+        }
+        slidesField.style.transform = `translateX(-${offset}px)`
+
+
+        if (slideIndex == slides.length) {
+            slideIndex = 1;
+        }
+        else{
+            slideIndex++;
+        }
+
+        if (slides.length < 10){
+            current.textContent = `0${slideIndex}`
+        }else {
+            current.textContent = slideIndex;
+        }
     });
+    
+    prev.addEventListener('click', () => {
+        if (offset == 0){
+            offset = +width.slice(0, width.length - 2) * (slides.length -1 ) 
+        } else {
+            offset -= +width.slice(0, width.length - 2);
+        }
+        slidesField.style.transform = `translateX(-${offset}px)`
+
+        if (slideIndex == 1) {
+            slideIndex = slides.length;
+        }
+        else{
+            slideIndex--;
+        }
+
+        if (slides.length < 10){
+            current.textContent = `0${slideIndex}`
+        }else {
+            current.textContent = slideIndex;
+        }
+
+      
+    });
+
 });
