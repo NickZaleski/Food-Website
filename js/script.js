@@ -515,71 +515,102 @@ const slideCounterCondition = () => {
 }
 // calculator
 
+
+// берем тег в котором заключен результат и присваеваем переменной
 const result = document.querySelector('.calculating__result span');
+// создаем переменные, в которых уже выбрана женщина и коэффицент
+// а так же рост, вес и возраст
 let sex = 'female',
     height, weight, age,
     ratio = 1.375;
-
+// функция которая считает все значения
 function calcTotal() {
+// если нет пола или нет роста или нет веса или возраста или коэффицента, то
     if(!sex || !height || !weight || !age || !ratio){
+// покажи результат пустой
         result.textContent = '____';
+// остановить выполнение фукнции
         return;
     }
+// если пол женский, то пользуемся вот таким уравнением
     if (sex === 'female'){
         result.textContent = ((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio).toFixed(2)
-    } else {
+    } 
+// иначе (мужской), пользуемся вот таким уравнением и записываем результат в переменную
+    else {
         result.textContent = ((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio).toFixed(2)
     }
 }
+// вызываем фукнцию
 calcTotal();
 
+// получаем статическую информацию (та что кнопочная)
+// используем параментры слектор и активный класс
     function getStaticInformation(parentSelector, activeClass) {
+// для переменной элементс выбираем все родительские селекторы с тегом див
         const elements = document.querySelectorAll(`${parentSelector} div`);
 
-
+// каждый элемент перебираем и обрабатываем событие по клику
         elements.forEach(elem => {
             elem.addEventListener('click', (e) => {
+    // если при нажатии мы получили аттрибут data-ratio,
                 if (e.target.getAttribute('data-ratio')){
+    // то присваеваем ratio цифровое значение дата аттрибута
                     ratio = +e.target.getAttribute('data-ratio');
                 } else {
+    // иначе, если при нажатии полчаем id, то присваеваем в переменную пол
                     sex = e.target.getAttribute('id');
                    
                 }
-    
+    // так же для кажлого элемент перебор делаем
                 elements.forEach(elem => {
+                // удаляем активный класс
                     elem.classList.remove(activeClass);
                 })
+    // и назначаем класс на событие!
                 e.target.classList.add(activeClass);
-    
+    // вызываем функцию, которая даёт нам возможность посчитать результат
                 calcTotal();
             });
         });
         
     };
 
-
+    // вызываем стаческую фукнцию, первым аргументом передаем пол, вторым - активный класс
     getStaticInformation('#gender', 'calculating__choose-item_active');
+    // вызываем статическую фукнцию для разных типов активности
     getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
 
+
+// создание функции для динамической информации
     function getDynamicInformation(selector){
+    // добавили переменную инпут с и по селектору выбрали селектор
         const input = document.querySelector(selector);
-        
+    // на поле для ввода повесили событие
         input.addEventListener('input', () => {
+    // если инпут имеет аттрибут айди
             switch(input.getAttribute('id')) {
+    // в случае с высотой
                 case 'height':
+    // присвоить высоте введенное числовое значение 
                     height = +input.value;
                     break;
+    // присвоить весу введенное числовое значение
                 case 'weight':
                     weight = +input.value;
                     break;
+    // присвоить возрасту введенное числовое значение
                 case 'age':
                     age = +input.value;
                     break;
             }
+    // вызываем функцию, которая пересчитывает нам всё это
             calcTotal();
         });
         
     }
+
+    // вызываем фукнции по селектору
     getDynamicInformation('#height');
     getDynamicInformation('#weight');
     getDynamicInformation('#age');
